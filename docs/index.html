@@ -3,7 +3,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>本日存活證明 - 任務系統 v1</title>
+  <title>本日存活證明 v1.2</title>
   <style>
     body {
       background: #121212;
@@ -14,6 +14,13 @@
     }
     h1 {
       text-align: center;
+    }
+    .version {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      font-size: 0.85em;
+      color: #aaa;
     }
     .task {
       background: #1e1e1e;
@@ -40,14 +47,28 @@
     .button:hover {
       background: #666;
     }
+    .section-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 2em;
+      border-bottom: 1px solid #444;
+      padding-bottom: 4px;
+    }
     .reset-area {
       text-align: center;
       margin-top: 20px;
     }
+    .muted {
+      opacity: 0.6;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
+  <div class="version">v1.2</div>
   <h1>📋 本日存活任務</h1>
+
+  <div class="section-title">📅 每日任務</div>
   <div class="task">
     <div>
       <strong>喝水</strong><br>
@@ -61,6 +82,24 @@
       <span id="weight-count">0</span> / <span id="weight-goal">3</span> 組 (Lv.<span id="weight-lv">0</span>)
     </div>
     <button class="button" onclick="addOne('weight')">+1</button>
+  </div>
+
+  <div class="section-title">📚 長期任務</div>
+  <div class="task">
+    <div>
+      <strong>閱讀進度</strong><br>
+      25章（Lv.4）
+    </div>
+    <button class="button">+1</button>
+  </div>
+
+  <div class="section-title">💤 閒置任務</div>
+  <div class="task muted">
+    <div>
+      <strong>單字背誦</strong><br>
+      閒置 4 天
+    </div>
+    <button class="button">喚醒</button>
   </div>
 
   <div class="reset-area">
@@ -120,7 +159,19 @@
       alert("✅ 每日任務已結算！");
     }
 
-    window.onload = loadTasks;
+    function autoVersionParam() {
+      const version = "v1.2";
+      if (!location.search.includes("v=")) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("v", version);
+        window.location.replace(url.toString());
+      }
+    }
+
+    window.onload = () => {
+      autoVersionParam();
+      loadTasks();
+    };
   </script>
 </body>
 </html>
