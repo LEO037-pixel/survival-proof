@@ -2,31 +2,125 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>本日存活證明 v0.1</title>
+  <meta charset="UTF-8">
+  <title>本日存活證明 - 任務系統 v1</title>
   <style>
     body {
       background: #121212;
       color: #f0f0f0;
       font-family: 'Noto Sans TC', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
+      padding: 20px;
     }
     h1 {
-      font-size: 2rem;
+      text-align: center;
     }
-    p {
-      opacity: 0.7;
-      margin-top: 0.5rem;
+    .task {
+      background: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px auto;
+      width: 320px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task span {
+      font-size: 0.9em;
+    }
+    .button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background: #666;
+    }
+    .reset-area {
+      text-align: center;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>📜 本日存活證明</h1>
-  <p>這是你的全新首頁模板。你可以開始新增任務介面、成就、紀錄等功能。</p>
+  <h1>📋 本日存活任務</h1>
+  <div class="task">
+    <div>
+      <strong>喝水</strong><br>
+      <span id="water-count">0</span> / <span id="water-goal">8</span> 杯 (Lv.<span id="water-lv">0</span>)
+    </div>
+    <button class="button" onclick="addOne('water')">+1</button>
+  </div>
+  <div class="task">
+    <div>
+      <strong>舉啞鈴</strong><br>
+      <span id="weight-count">0</span> / <span id="weight-goal">3</span> 組 (Lv.<span id="weight-lv">0</span>)
+    </div>
+    <button class="button" onclick="addOne('weight')">+1</button>
+  </div>
+
+  <div class="reset-area">
+    <button class="button" onclick="manualReset()">🕛 手動每日結算</button>
+  </div>
+
+  <script>
+    const tasks = {
+      water: { count: 0, goal: 8, lv: 0, limit: 20 },
+      weight: { count: 0, goal: 3, lv: 0, limit: null }
+    };
+
+    function loadTasks() {
+      Object.keys(tasks).forEach(key => {
+        const stored = JSON.parse(localStorage.getItem(key) || "{}");
+        if (stored.count !== undefined) tasks[key].count = stored.count;
+        if (stored.goal !== undefined) tasks[key].goal = stored.goal;
+        if (stored.lv !== undefined) tasks[key].lv = stored.lv;
+      });
+      updateDisplay();
+    }
+
+    function saveTask(key) {
+      localStorage.setItem(key, JSON.stringify(tasks[key]));
+    }
+
+    function updateDisplay() {
+      Object.keys(tasks).forEach(key => {
+        document.getElementById(`${key}-count`).textContent = tasks[key].count;
+        document.getElementById(`${key}-goal`).textContent = tasks[key].goal;
+        document.getElementById(`${key}-lv`).textContent = tasks[key].lv;
+      });
+    }
+
+    function addOne(key) {
+      const task = tasks[key];
+      if (task.limit !== null && task.count >= task.limit) {
+        alert("⚠️ 超出健康上限，請適量！");
+        return;
+      }
+      task.count += 1;
+      saveTask(key);
+      updateDisplay();
+    }
+
+    function manualReset() {
+      Object.keys(tasks).forEach(key => {
+        const task = tasks[key];
+        if (task.count >= task.goal) {
+          task.lv += 1;
+          task.count -= task.goal;
+          task.goal += 1;
+        }
+        saveTask(key);
+      });
+      updateDisplay();
+      alert("✅ 每日任務已結算！");
+    }
+
+    window.onload = loadTasks;
+  </script>
 </body>
 </html>
